@@ -9,7 +9,7 @@ body:
   id: building
   attributes:
     label: 事发楼栋
-    placeholder: 例如：3号楼
+    placeholder: 例如：C号楼
   validations:
     required: true
 - type: input
