@@ -29,19 +29,6 @@ body:
   validations:
     required: true
 - type: input
-  id: machine
-  attributes:
-    label: 洗衣机编号（选填）
-  validations:
-    required: false
-- type: textarea
-  id: rule
-  attributes:
-    label: 场所使用规则
-    description: 请说明现场公布的规则；未发现相关规则请如实填写，不将个人偏好直接作为违规依据。
-  validations:
-    required: true
-- type: input
   id: time
   attributes:
     label: 发生时间
