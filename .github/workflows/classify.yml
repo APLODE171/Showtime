@@ -1,0 +1,82 @@
+name: 事件分类
+on:
+  issues:
+    types: [opened, edited]
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: classify-${{ github.event.issue.number || 'setup' }}
+  cancel-in-progress: false
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 初始化标签并同步事件分类
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const labels = [
+              ['类型/厕所吸烟','D4A72C'],
+              ['类型/洗衣机使用问题','1D76DB'],
+              ['类型/更正或撤下','B60205'],
+              ['状态/待核实','FBCA04'],
+              ['状态/已核实','0E8A16'],
+              ['状态/处理中','1D76DB'],
+              ['状态/已处理','006B75'],
+              ['状态/不予受理','CFD3D7'],
+              ['方位/东侧','C2E0C6'],
+              ['方位/西侧','C2E0C6']
+            ];
+            async function ensure(name, color) {
+              try { await github.rest.issues.getLabel({owner, repo, name}); }
+              catch (e) {
+                if(e.status !== 404) throw e;
+                try { await github.rest.issues.createLabel({owner, repo, name, color}); }
+                catch(conflict) {
+                  if(conflict.status !== 422) throw conflict;
+                  await github.rest.issues.getLabel({owner, repo, name});
+                }
+              }
+            }
+            for(const [name,color] of labels) await ensure(name,color);
+            if(!context.payload.issue) return;
+            // Read the latest body, never evaluate user text or fetch attachment URLs.
+            const {data:issue} = await github.rest.issues.get({owner,repo,issue_number:context.payload.issue.number});
+            if(issue.pull_request) return;
+            const body = issue.body || '';
+            function field(heading) {
+              const lines = body.split(/\r?\n/);
+              const at = lines.findIndex(line => line === '### ' + heading);
+              if(at < 0) return '';
+              const values = [];
+              for(let i=at+1; i<lines.length && !lines[i].startsWith('### '); i++) values.push(lines[i]);
+              return values.join(' ').replace(/\s+/g,' ').trim();
+            }
+            function safeLocation(value) {
+              return /^[\p{L}\p{N} _（）()\-]{1,30}$/u.test(value) && value !== '_No response_' ? value : '';
+            }
+            const correction = /^\[更正\/撤下\]/.test(issue.title) || (field('原事件编号') && field('申请类型'));
+            const laundry = /^\[洗衣机使用问题\]/.test(issue.title) || !!field('洗衣机方位');
+            const smoking = /^\[厕所吸烟\]/.test(issue.title) || !!field('事发楼栋');
+            if(!correction && !laundry && !smoking) return;
+            const wanted = [correction ? '类型/更正或撤下' : laundry ? '类型/洗衣机使用问题' : '类型/厕所吸烟'];
+            if(!correction) {
+              for(const [heading,prefix] of [['事发楼栋','楼栋/'],['事发楼层','楼层/']]) {
+                const value = safeLocation(field(heading));
+                if(value) { const name = prefix + value; await ensure(name,'D4E8D4'); wanted.push(name); }
+              }
+              const side = field('洗衣机方位');
+              if(laundry && ['东侧','西侧'].includes(side)) wanted.push('方位/' + side);
+            }
+            // Preserve administrator-selected states, including on user edits.
+            if(!issue.labels.some(label => label.name.startsWith('状态/'))) wanted.push('状态/待核实');
+            for(const label of issue.labels) {
+              if(['类型/','楼栋/','楼层/','方位/'].some(prefix => label.name.startsWith(prefix)) && !wanted.includes(label.name)) {
+                try { await github.rest.issues.removeLabel({owner,repo,issue_number:issue.number,name:label.name}); }
+                catch(e) { if(e.status !== 404) throw e; }
+              }
+            }
+            await github.rest.issues.addLabels({owner,repo,issue_number:issue.number,labels:wanted});

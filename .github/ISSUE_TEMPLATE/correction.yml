@@ -1,0 +1,41 @@
+name: 更正或撤下申请
+description: 提供事件编号和简要原因，不重复敏感内容。
+title: '[更正/撤下] #事件编号'
+body:
+- type: markdown
+  attributes:
+    value: '**提交后立即公开，GitHub 用户名也会显示，尚未经过管理员核实。** 不要填写姓名、宿舍号、学号等个人信息。照片请先在本机遮挡身份信息并移除 EXIF/GPS；GitHub 不会替你处理。不要上传厕所私密场景或可识别个人的照片。'
+- type: input
+  id: number
+  attributes:
+    label: 原事件编号
+    placeholder: 例如：123
+  validations:
+    required: true
+- type: dropdown
+  id: request
+  attributes:
+    label: 申请类型
+    options:
+    - 更正信息
+    - 撤下内容
+    - 隐私泄露
+    - 其他
+  validations:
+    required: true
+- type: textarea
+  id: reason
+  attributes:
+    label: 申请原因
+    description: 请勿再次贴出个人信息或敏感附件。
+  validations:
+    required: true
+- type: checkboxes
+  id: public
+  attributes:
+    label: 公开确认
+    options:
+    - label: 我知悉此申请立即公开，不在申请中重复敏感信息。
+      required: true
+  validations:
+    required: true

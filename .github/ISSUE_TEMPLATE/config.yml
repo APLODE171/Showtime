@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 提交前先阅读公开与照片说明
+    url: https://github.com/APLODE171/Showtime#照片上传前
+    about: 公开内容立即可见；请先遮挡身份信息并移除照片定位元数据。

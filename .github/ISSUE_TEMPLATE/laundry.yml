@@ -1,0 +1,75 @@
+name: 洗衣机使用问题
+description: 按地点反馈洗衣机使用问题，所有提交立即公开。
+title: '[洗衣机使用问题] 请填写事发楼栋和楼层'
+body:
+- type: markdown
+  attributes:
+    value: '**提交后立即公开，GitHub 用户名也会显示，尚未经过管理员核实。** 不要填写姓名、宿舍号、学号等个人信息。照片请先在本机遮挡身份信息并移除 EXIF/GPS；GitHub 不会替你处理。不要上传厕所私密场景或可识别个人的照片。'
+- type: input
+  id: building
+  attributes:
+    label: 事发楼栋
+    placeholder: 例如：3号楼
+  validations:
+    required: true
+- type: input
+  id: floor
+  attributes:
+    label: 事发楼层
+    placeholder: 例如：2层
+  validations:
+    required: true
+- type: dropdown
+  id: side
+  attributes:
+    label: 洗衣机方位
+    options:
+    - 东侧
+    - 西侧
+  validations:
+    required: true
+- type: input
+  id: machine
+  attributes:
+    label: 洗衣机编号（选填）
+  validations:
+    required: false
+- type: textarea
+  id: rule
+  attributes:
+    label: 场所使用规则
+    description: 请说明现场公布的规则；未发现相关规则请如实填写，不将个人偏好直接作为违规依据。
+  validations:
+    required: true
+- type: input
+  id: time
+  attributes:
+    label: 发生时间
+    placeholder: 例如：2026-10-20 18:30（北京时间）
+  validations:
+    required: true
+- type: textarea
+  id: description
+  attributes:
+    label: 事实描述
+    description: 描述观察到的情况与环境影响，不填写涉事者身份或侮辱性内容。
+  validations:
+    required: true
+- type: textarea
+  id: photos
+  attributes:
+    label: 已脱敏照片
+    description: 将处理后的照片拖到这里；无可安全提供的照片时填写“无照片”。请勿上传原图后再处理。
+  validations:
+    required: true
+- type: checkboxes
+  id: confirm
+  attributes:
+    label: 公开提交确认
+    options:
+    - label: 我知悉正文、附件和 GitHub 用户名会立即公开，不填写本人或他人的住宿及身份信息。
+      required: true
+    - label: 如提供照片，已在本机遮挡身份信息并移除定位元数据，不包含私密影像；正文只描述事件，不猜测或追踪个人身份。
+      required: true
+  validations:
+    required: true
