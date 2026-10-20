@@ -45,7 +45,7 @@ body:
   id: time
   attributes:
     label: 发生时间
-    placeholder: 例如：2026-10-20 18:30（北京时间）
+    placeholder: 例如：2026-10-20 18:30之前
   validations:
     required: true
 - type: textarea
